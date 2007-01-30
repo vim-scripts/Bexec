@@ -1,0 +1,8 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=1788
+
+The Bexec plugin allows the user to execute the current buffer if it contains a script with a shebang (#!/path/to/interpreter) on the first line or if the default interpreter for the script's type is known by Bexec. The output of the script will be grabbed and displayed in a separate buffer.
+
+It can be used to execute, for instance, Shell, PHP, PERL, Python or SQL scripts from within Vim.
+
+Screenshots can be found at: http://www.electricmonk.nl/index.php?page=bexec
+
