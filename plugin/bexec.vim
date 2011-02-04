@@ -3,10 +3,10 @@
 " Use the shebang (#!) or filetype to execute a script in the current buffer,
 " capture its output and put it in a seperate buffer.
 "
-" Last Change:	2007 Feb 06
-" Version:      v0.3
-" Maintainer:	Ferry Boender <f DOT boender AT electricmonk DOT nl>
-" License:	    This file is placed in the public domain.
+" Last Change:  2010 Feb 04
+" Version:      v0.5
+" Maintainer:   Ferry Boender <ferry DOT boender AT electricmonk DOT nl>
+" License:      This file is placed in the public domain.
 " Usage:        To use this script:
 "               
 "               - Place in your .vim/plugin/ dir.
@@ -17,7 +17,7 @@
 "                OR
 "               Type <leader>bx (usually \bx)
 "                OR
-"               Run :BexecVisual  (in visual select mode)
+"               Run :call BexecVisual()  (in visual select mode)
 "                OR
 "               Type <leader>bx (usually \bx) in visual mode.
 "
@@ -41,7 +41,17 @@
 "               * Horizontal column pos gets lost when running in visual
 "                 select mode.
 "               * Fix FIXME's.
-" Changelog:    v0.3 (Feb 6, 2007)
+" Changelog:    v0.5 (Feb 04, 2010)
+"                 * Bugfix in argument handling in Visual mode execution. Range
+"                   is appended to argument-string, which is wrong. (Mostly
+"                   affected Zsh users). (thanks to Sven Hergenhahn)
+"                 * Leader-mappings <leader>bx and <leader>bc are now mapped 
+"                   regardless of previously existing (custom) mappings to Bexec()
+"                   functions. (thanks to Sven Hergenhahn)
+"               v0.4 (Feb 16, 2007)
+"                 * Bugfix in BExecCloseOut(). Thanks to Uwe GeldWaescher.
+"                 * Removed some redundant code.
+"               v0.3 (Feb 6, 2007)
 "                 * BexecCloseOut() added to close the output window (\bc)
 "                 * bexec_interpreter setting added.
 "                 * Small code cleanups.
@@ -76,15 +86,9 @@ let loaded_bexec = 1
 "
 " Define some mappings to BExec
 "
-if !hasmapto("Bexec")
-    nmap <silent> <unique> <Leader>bx :call Bexec()<CR>
-endif
-if !hasmapto("BexecVisual")
-    vmap <silent> <unique> <Leader>bx :call BexecVisual()<CR>
-endif
-if !hasmapto("BexecCloseOut")
-    nmap <silent> <unique> <Leader>bc :call BexecCloseOut()<CR>
-endif
+nmap <silent> <unique> <Leader>bx :call Bexec()<CR>
+vmap <silent> <unique> <Leader>bx :call BexecVisual()<CR>
+nmap <silent> <unique> <Leader>bc :call BexecCloseOut()<CR>
 
 "
 " Let's do some settings too.
@@ -254,15 +258,7 @@ function! <SID>FindOrCreateOutWin(bufName)
     " Find or create a window for the bufName
     if l:outWinNr == -1
         " Create a new window
-        let l:splitCmdMap = {"ver":"vsp", "hor":"vp"}
-        let l:splitCmd = l:splitCmdMap[g:bexec_splitdir]
-        if g:bexec_splitdir == "ver"
-            let l:splitCmd = "vsp"
-        else
-            let l:splitCmd = "sp"
-        endif
-
-        exec l:splitCmd
+        exec {"ver":"vsp", "hor":"sp"}[g:bexec_splitdir]
 
         let l:outWinNr = bufwinnr("%")
         if l:outBufNr != -1
@@ -376,7 +372,7 @@ endfunction
 "
 " Main Bexec function. 
 "
-function! <SID>BexecDo(...)
+function! <SID>BexecDo(range, ...)
     let l:curpos=getpos(".")
     let l:interpreter = <SID>GetInterpreter()
 
@@ -386,9 +382,9 @@ function! <SID>BexecDo(...)
     elseif l:interpreter == -2
         echo "Invalid interpreter."
     else
-        if a:0 == 1
+        if len(a:range) > 0
             " Run visually selected text
-            let l:scriptFilename = <SID>GetScriptFilename(a:1)
+            let l:scriptFilename = <SID>GetScriptFilename(a:range)
         else
             " Run entire buffer
             let l:scriptFilename = <SID>GetScriptFilename()
@@ -404,7 +400,7 @@ endfunction
 " Close/Delete the output window/buffer.
 "
 function! BexecCloseOut()
-    silent! exec "bdelete! ".s:bexec_outbufname
+    silent! exec "bwipeout! ".s:bexec_outbufname
 endfunction
 
 "
@@ -422,5 +418,5 @@ endfunction
 " Wrapper function for normal buffer execution.
 "
 function! Bexec(...) 
-    call <SID>BexecDo()
+    call <SID>BexecDo([])
 endfunction
