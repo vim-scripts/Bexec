@@ -3,8 +3,8 @@
 " Use the shebang (#!) or filetype to execute a script in the current buffer,
 " capture its output and put it in a seperate buffer.
 "
-" Last Change:  2010 Feb 04
-" Version:      v0.5
+" Last Change:  2014 Mar 31
+" Version:      v0.6
 " Maintainer:   Ferry Boender <ferry DOT boender AT electricmonk DOT nl>
 " License:      This file is placed in the public domain.
 " Usage:        To use this script:
@@ -41,7 +41,9 @@
 "               * Horizontal column pos gets lost when running in visual
 "                 select mode.
 "               * Fix FIXME's.
-" Changelog:    v0.5 (Feb 04, 2010)
+" Changelog:    v0.6 (Mar 31, 2014)
+"                 * Support for Windows (by mohd-akram).
+"               v0.5 (Feb 04, 2010)
 "                 * Bugfix in argument handling in Visual mode execution. Range
 "                   is appended to argument-string, which is wrong. (Mostly
 "                   affected Zsh users). (thanks to Sven Hergenhahn)
@@ -143,12 +145,20 @@ let s:script_types = [
     \ 'pike', 'tclsh' ]
 let s:interpreters = { }
 for n in s:script_types
-    let s:interpreters[n] = "/usr/bin/env " . n
+    if has('win32') || has('win64')
+        let s:interpreters[n] = n
+    else
+        let s:interpreters[n] = "/usr/bin/env " . n
+    endif
 endfor
 " Add user's custom interpreters.
 if exists("bexec_script_types")
     for n in g:bexec_script_types
-        let s:interpreters[n] = "/usr/bin/env " . n
+        if has('win32') || has('win64')
+            let s:interpreters[n] = n
+        else
+            let s:interpreters[n] = "/usr/bin/env " . n
+        endif
     endfor
 endif
 
@@ -304,7 +314,7 @@ function! <SID>RunAndRedirectOut(interpreter, curFile, args, bufName)
     endif
 
     " Build the final (vim) command we're gonna run 
-    let l:runCmd = l:runCmd." ".a:interpreter." '".a:curFile."' ".a:args
+    let l:runCmd = l:runCmd." ".a:interpreter.' "'.a:curFile.'" '.a:args
 
     " Add a separator line to distinguish between different script output
     if g:bexec_outputmode == "append"
