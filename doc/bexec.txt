@@ -1,6 +1,6 @@
-*bexec.txt*      Buffer execute and grab output      Last Change: 04 Feb 2010
+*bexec.txt*      Buffer execute and grab output      Last Change: 19 Oct 2014
 
-Buffer Execute (v0.5)                                *buffer-execute* *bexec*
+Buffer Execute (v0.8)                                *buffer-execute* *bexec*
 
 The Bexec plugin allows the user to execute the current buffer if it
 contains a script with a shebang (#!/path/to/interpreter) on the first line.
@@ -104,7 +104,9 @@ window, you can modify the bexec_splitdir setting: >
   :let bexec_splitdir=[direction]
 
 [direction] can be "hor" for horizontal or "ver" for vertical splitting.
-The default is horizontal splitting.
+The default is horizontal splitting. If you prefer your split window to appear
+on the right or below (instead of the left or above), you can use Vim's :set
+splitbelow and :set splitright settings.
 
                                                          *g:bexec_outputmode*
 To control what Bexec does with the output of a script: >
@@ -255,6 +257,16 @@ MISC                                                             *bexec-misc*
 
 Changelog
 
+    v0.8
+        - Honor splitbelow vim setting (by Christopher Pease).
+
+    v0.7
+        - Support for automatic live updating of the bexec buffer (by
+          Jcslassi).
+
+    v0.6
+        - Support for Windows (by mohd-akram).
+
     v0.5
         - Bugfix in argument handling in Visual mode execution. Range
           is appended to argument-string, which is wrong. (Mostly
@@ -289,6 +301,9 @@ Credits:
     Many thanks to the following (groups of) people:
 
         - The people of #vim on the FreeNode IRC network for script help.
+        - Christopher Pease for patches.
+        - jcslassi for patches.
+        - mohd-akram for patches.
         - Alexandru E. Ungur for various suggestions and patches. 
         - Michiel 'Mafkees' van Baak for beta testing.
         - Steven Looman for various suggestions.
