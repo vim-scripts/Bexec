@@ -4,5 +4,5 @@ The Bexec plugin allows the user to execute the current buffer if it contains a 
 
 It can be used to execute, for instance, Shell, PHP, PERL, Python or SQL scripts from within Vim.
 
-Screenshots can be found at: https://bitbucket.org/fboender/bexec/wiki/Screenshots
+Screenshots can be found at: https://github.com/fboender/bexec
 
